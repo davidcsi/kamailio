@@ -41,6 +41,8 @@ extern db_locking_t db_table_lock;
 extern str nsq_presentity_table;
 extern str nsq_db_url;
 
+static presence_api_t nsq_presenceb;
+
 extern int dbn_include_entity;
 extern int dbn_pua_mode;
 
@@ -200,6 +202,132 @@ error:
 
 	return ret;
 }
+
+/*int nsq_pua_update_presentity(str* event, str* realm, str* user, str* etag, str* sender, str* body, int expires, int reset)
+{
+	db_key_t query_cols[13];
+	db_op_t  query_ops[13];
+	db_val_t query_vals[13];
+	int n_query_cols = 0;
+	int ret = -1;
+	int use_replace = 1;
+
+	query_cols[n_query_cols] = &str_event_col;
+	query_ops[n_query_cols] = OP_EQ;
+	query_vals[n_query_cols].type = DB1_STR;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *event;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_domain_col;
+	query_ops[n_query_cols] = OP_EQ;
+	query_vals[n_query_cols].type = DB1_STR;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *realm;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_username_col;
+	query_ops[n_query_cols] = OP_EQ;
+	query_vals[n_query_cols].type = DB1_STR;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *user;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_etag_col;
+	query_ops[n_query_cols] = OP_EQ;
+	query_vals[n_query_cols].type = DB1_STR;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *etag;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_sender_col;
+	query_vals[n_query_cols].type = DB1_STR;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *sender;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_body_col;
+	query_vals[n_query_cols].type = DB1_BLOB;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.str_val = *body;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_received_time_col;
+	query_vals[n_query_cols].type = DB1_INT;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.int_val = (int)time(NULL);
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_expires_col;
+	query_vals[n_query_cols].type = DB1_INT;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.int_val = expires;
+	n_query_cols++;
+
+	query_cols[n_query_cols] = &str_priority_col;
+	query_vals[n_query_cols].type = DB1_INT;
+	query_vals[n_query_cols].nul = 0;
+	query_vals[n_query_cols].val.int_val = 0;
+	n_query_cols++;
+
+	if (nsq_pa_dbf.use_table(nsq_pa_db, &nsq_presentity_table) < 0) {
+		LM_ERR("unsuccessful use_table [%.*s]\n", nsq_presentity_table.len, nsq_presentity_table.s);
+		goto error;
+	}
+
+	if (nsq_pa_dbf.replace == NULL || reset > 0) {
+		use_replace = 0;
+		LM_DBG("using delete/insert instead of replace\n");
+	}
+
+	if (nsq_pa_dbf.start_transaction) {
+		if (nsq_pa_dbf.start_transaction(nsq_pa_db, db_table_lock) < 0) {
+			LM_ERR("in start_transaction\n");
+			goto error;
+		}
+	}
+
+	if (use_replace) {
+		if (nsq_pa_dbf.replace(nsq_pa_db, query_cols, query_vals, n_query_cols, 4, 0) < 0) {
+			LM_ERR("replacing record in database\n");
+			if (nsq_pa_dbf.abort_transaction) {
+				if (nsq_pa_dbf.abort_transaction(nsq_pa_db) < 0) {
+					LM_ERR("in abort_transaction\n");
+				}
+			}
+			goto error;
+		}
+	} else {
+		if (nsq_pa_dbf.delete(nsq_pa_db, query_cols, query_ops, query_vals, 4-reset) < 0) {
+			LM_ERR("deleting record in database\n");
+			if (nsq_pa_dbf.abort_transaction) {
+				if (nsq_pa_dbf.abort_transaction(nsq_pa_db) < 0)
+					LM_ERR("in abort_transaction\n");
+			}
+			goto error;
+		}
+		if (nsq_pa_dbf.insert(nsq_pa_db, query_cols, query_vals, n_query_cols) < 0) {
+			LM_ERR("replacing record in database\n");
+			if (nsq_pa_dbf.abort_transaction) {
+				if (nsq_pa_dbf.abort_transaction(nsq_pa_db) < 0) {
+					LM_ERR("in abort_transaction\n");
+				}
+			}
+			goto error;
+		}
+	}
+
+	if (nsq_pa_dbf.end_transaction) {
+		if (nsq_pa_dbf.end_transaction(nsq_pa_db) < 0) {
+			LM_ERR("in end_transaction\n");
+			goto error;
+		}
+	}
+
+error:
+
+	return ret;
+}*/
 
 int nsq_pua_publish_presence_to_presentity(struct json_object *json_obj) {
 	int ret = 1;

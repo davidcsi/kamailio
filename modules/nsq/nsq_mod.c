@@ -199,6 +199,13 @@ static int mod_init(void)
 			nsq_pa_dbf.close(nsq_pa_db);
 			nsq_pa_db = NULL;
 		}
+	} else {
+		/* bind the PRESENCE API */
+		if (presence_load_api(&nsq_presence) < 0) {
+			LM_ERR("cannot bind to PRESENCE API\n");
+			return -1;
+		}
+		LM_DBG("loaded presence api\n");
 	}
 
 	LM_DBG("NSQ Workers per Topic/Channel: %d\n", dbn_consumer_workers);

@@ -90,6 +90,9 @@ str nsq_db_url = {NULL, 0};
 int db_table_lock_type = 1;
 db_locking_t db_table_lock = DB_LOCKING_WRITE;
 
+/* presence api */
+static presence_api_t nsq_presence;
+
 static int mod_init(void);
 static int mod_child_init(int);
 static int nsq_add_topic_channel(modparam_t type, void* val);
